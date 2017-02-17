@@ -1,4 +1,4 @@
-package ServerCast
+package main
 
 type PodcastFeed struct {
 	RssURL string
