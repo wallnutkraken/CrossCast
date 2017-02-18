@@ -14,11 +14,11 @@ func NewDevide() Device {
 }
 
 type Devices struct {
-	List []Device
+	List []*Device
 }
 
-func (d *Devices) Add(name string) Device {
-	dev := Device{Name: name}
+func (d *Devices) Add(name string) *Device {
+	dev := &Device{Name: name}
 	dev.UUID = uuid.NewV4().String()
 	d.List = append(d.List, dev)
 	return dev
@@ -27,7 +27,7 @@ func (d *Devices) Add(name string) Device {
 func (d *Devices) FindDevice(deviceUUID string) (*Device, error) {
 	for _,  dev := range d.List {
 		if dev.UUID == deviceUUID {
-			return &dev, nil
+			return dev, nil
 		}
 	}
 	return nil, ErrNoSuchDevice

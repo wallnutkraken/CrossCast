@@ -9,7 +9,7 @@ func init() {
 func TestCanRegister(t *testing.T) {
 	userToRegister := User{"uname",
 		"pass",
-		Devices{},
+		&Devices{},
 		make([] PodcastFeed, 0)}
 	err := Register(userToRegister)
 	if err != nil {
@@ -28,7 +28,7 @@ func TestCanRegister(t *testing.T) {
 func TestCanRegisterDevice(t *testing.T) {
 	u := User{"user",
 		"pass",
-		Devices{},
+		&Devices{},
 		make([] PodcastFeed, 0)}
 	u.Devices.Add("TestDevice")
 
@@ -40,7 +40,7 @@ func TestCanRegisterDevice(t *testing.T) {
 func TestUserIsReference(t *testing.T) {
 	userToRegister := User{"uname2",
 			       "pass",
-			       Devices{},
+			       &Devices{},
 			       make([] PodcastFeed, 0)}
 	err := Register(userToRegister)
 	if err != nil {
@@ -55,5 +55,21 @@ func TestUserIsReference(t *testing.T) {
 	anotherUser, err := FindUser(userToRegister.Username)
 	if anotherUser.Password != user.Password {
 		t.Fatal("Users are not handled by reference")
+	}
+}
+
+func TestDevices_Add(t *testing.T) {
+	u, err := FindUser("uname")
+	if err != nil {
+		t.Fatal(err)
+	}
+	dev := u.Devices.Add("newDevice")
+	device, err := u.Devices.FindDevice(dev.UUID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	dev.ElapsedSeconds = 3
+	if device.ElapsedSeconds != 3 {
+		t.Fatal("Elapsed seconds did not change")
 	}
 }

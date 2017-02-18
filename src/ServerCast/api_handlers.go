@@ -68,7 +68,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	err = Register(User{
 		req.Username,
 		req.Password,
-		Devices{},
+		&Devices{},
 		make([]PodcastFeed, 0)})
 	if err != nil {
 		response, _ := ToJSON(GenericResponse{false, err.Error() + err.Error(), nil})

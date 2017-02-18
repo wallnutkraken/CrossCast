@@ -124,7 +124,8 @@ func TestAPI_CanChangeElapsedTime(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	url := "http://localhost:8080/device/" + user.Devices.List[0].UUID + "/elapsed"
+	deviceUUID := user.Devices.List[0].UUID
+	url := "http://localhost:8080/device/" + deviceUUID + "/elapsed"
 
 	r, err := http.NewRequest("POST", url, bytes.NewBuffer(requestJSON))
 	if err != nil {
@@ -147,5 +148,12 @@ func TestAPI_CanChangeElapsedTime(t *testing.T) {
 
 	if !response.Success {
 		t.Fatal("Not successful", response)
+	}
+
+	emile, _ := FindUser("emile")
+	dev, _ := emile.Devices.FindDevice(deviceUUID)
+	seconds := dev.ElapsedSeconds
+	if seconds != 20 {
+		t.Fatal("Elapsed time not actually changed in memory; was", seconds, "expected 20")
 	}
 }
