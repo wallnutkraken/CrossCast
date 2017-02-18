@@ -35,16 +35,15 @@ func (tc *TokenCollection) New(username string) AccessToken {
 	return newToken
 }
 
-func (tc TokenCollection) FindUser(token string) (User, error) {
-	user := User{}
+func (tc TokenCollection) FindUser(token string) (*User, error) {
 	for _, accessToken := range tc.Tokens {
 		if accessToken.Token == token {
 			if !accessToken.Valid() {
-				return user, ErrTokenExpired
+				return nil, ErrTokenExpired
 			}
 			return FindUser(accessToken.Owner)
 		}
 	}
-	return user, ErrNoSuchUser
+	return nil, ErrNoSuchUser
 
 }

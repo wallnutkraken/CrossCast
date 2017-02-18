@@ -12,12 +12,14 @@ var (
 	tokens TokenCollection
 )
 
-func main() {
+func setup() {
 	rand.Seed(time.Now().UnixNano())
 	users = make(Users, 0)
 	tokens = TokenCollection{}
-	println("starting")
-
 	router = NewRouter()
+}
+
+func main() {
+	setup()
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

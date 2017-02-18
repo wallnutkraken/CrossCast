@@ -13,7 +13,7 @@ func init() {
 	go main()
 }
 
-func TestCanRegister(t *testing.T) {
+func TestAPI_CanRegister(t *testing.T) {
 	req := RegisterRequest{"emile", "password"}
 	requestJSON, _ := ToJSON(req)
 
@@ -41,7 +41,7 @@ func TestCanRegister(t *testing.T) {
 	}
 }
 
-func TestCanLogin(t *testing.T) {
+func TestAPI_CanLogin(t *testing.T) {
 	req := LoginRequest{"emile", "password"}
 	requestJSON, _ := ToJSON(req)
 
@@ -79,7 +79,7 @@ func TestCanLogin(t *testing.T) {
 
 }
 
-func TestCanAddDevice(t *testing.T) {
+func TestAPI_CanAddDevice(t *testing.T) {
 	req :=  CreateDeviceRequest{LoggedInRequest{tokens.Tokens[0].Token},
 		"DeviceName"}
 	requestJSON, _ := ToJSON(req)
@@ -111,8 +111,41 @@ func TestCanAddDevice(t *testing.T) {
 	if !response.Success {
 		t.Fatal("Not successful", response)
 	}
-	t.Log(response)
 	if _, err := uuid.FromString(response.Value.UUID); err != nil {
 		t.Fatal("Invalid device UUID")
+	}
+}
+
+func TestAPI_CanChangeElapsedTime(t *testing.T) {
+	req :=  SetElapsedTimeRequest{LoggedInRequest{tokens.Tokens[0].Token},
+				    20}
+	requestJSON, _ := ToJSON(req)
+	user, err := FindUser("emile")
+	if err != nil {
+		t.Fatal(err)
+	}
+	url := "http://localhost:8080/device/" + user.Devices.List[0].UUID + "/elapsed"
+
+	r, err := http.NewRequest("POST", url, bytes.NewBuffer(requestJSON))
+	if err != nil {
+		t.Fatal(err)
+	}
+	r.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	response := GenericResponse{}
+	bodyRead, _ := ioutil.ReadAll(resp.Body)
+	r.Body.Close()
+	err = json.Unmarshal(bodyRead, &response)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !response.Success {
+		t.Fatal("Not successful", response)
 	}
 }

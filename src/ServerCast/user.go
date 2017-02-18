@@ -32,15 +32,15 @@ func (u *User) ChangePassword(password string) error {
 	return nil
 }
 
-type Users []User
+type Users []*User
 
-func FindUser(username string) (User, error) {
+func FindUser(username string) (*User, error) {
 	for _, user := range users {
 		if user.Username == username {
 			return user, nil
 		}
 	}
-	return User{}, ErrInvalidLogin
+	return nil, ErrInvalidLogin
 }
 
 func Register(user User) error {
@@ -51,6 +51,6 @@ func Register(user User) error {
 	/* Call changepassword to hash the password */
 	user.ChangePassword(user.Password)
 
-	users = append(users, user)
+	users = append(users, &user)
 	return nil
 }
