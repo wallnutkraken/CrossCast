@@ -62,7 +62,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	err = Register(User{
 		req.Username,
 		req.Password,
-		make([]Device, 0),
+		Devices{},
 		make([]PodcastFeed, 0)})
 	if err != nil {
 		response, _ := ToJSON(GenericResponse{false, err.Error() + err.Error(), nil})
@@ -73,4 +73,25 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	response, _ := ToJSON(GenericResponse{true, "", nil})
 	w.Write(response)
 	w.WriteHeader(http.StatusOK)
+}
+
+func NewDeviceHandler(w http.ResponseWriter, r *http.Request) {
+	lir := CreateDeviceRequest{}
+	err := bodyToObject(r.Body, &lir)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	user, err := tokens.FindUser(lir.AccessToken)
+	if err != nil {
+		w.WriteHeader(http.StatusForbidden)
+		response, _ := ToJSON(GenericResponse{false, err.Error(), nil})
+		w.Write(response)
+		return
+	}
+	dev := user.Devices.Add(lir.DeviceName)
+	w.WriteHeader(http.StatusOK)
+	response, _ := ToJSON(dev)
+	w.Write(response)
 }

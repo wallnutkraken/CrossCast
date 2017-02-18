@@ -8,7 +8,7 @@ import (
 type User struct {
 	Username string
 	Password string
-	Devices []Device
+	Devices Devices
 	Subscriptions []PodcastFeed
 }
 // LoginValid verifies if the given password is valid for this user

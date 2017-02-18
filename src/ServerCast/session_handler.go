@@ -20,14 +20,31 @@ func (at AccessToken) Valid() bool {
 	return time.Now().Unix() - at.IssueDate < twenty_four_hours
 }
 
-type TokenCollection []AccessToken
+type TokenCollection struct {
+	Tokens []AccessToken
+}
 
-func (tc TokenCollection) New(username string) AccessToken {
+func (tc *TokenCollection) New(username string) AccessToken {
 	newToken := NewToken(username)
-	for index, token := range tc {
+	for index, token := range tc.Tokens {
 		if token.Owner == username {
-			tc[index] = newToken
+			tc.Tokens[index] = newToken
 		}
 	}
+	tc.Tokens = append(tc.Tokens, newToken)
 	return newToken
+}
+
+func (tc TokenCollection) FindUser(token string) (User, error) {
+	user := User{}
+	for _, accessToken := range tc.Tokens {
+		if accessToken.Token == token {
+			if !accessToken.Valid() {
+				return user, ErrTokenExpired
+			}
+			return FindUser(accessToken.Owner)
+		}
+	}
+	return user, ErrNoSuchUser
+
 }

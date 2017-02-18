@@ -24,4 +24,10 @@ var routes = Routes{
 		"/register",
 		RegisterHandler,
 	},
+	Route {
+		"NewDevice",
+		"POST",
+		"/device/add",
+		NewDeviceHandler,
+	},
 }
