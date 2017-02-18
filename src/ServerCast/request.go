@@ -21,6 +21,11 @@ type CreateDeviceRequest struct {
 	DeviceName string `json:"device_name"`
 }
 
+type SetElapsedTimeRequest struct {
+	LoggedInRequest
+	ElapsedTime int `json:"elapsed_time"`
+}
+
 func (j LoginRequest) ToJSON() ([]byte, error) {
 	return json.Marshal(j)
 }

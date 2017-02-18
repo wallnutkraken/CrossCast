@@ -30,4 +30,10 @@ var routes = Routes{
 		"/device/add",
 		NewDeviceHandler,
 	},
+	Route{
+		"SetElapsedTime",
+		"POST",
+		"/device/{uuid}/elapsed",
+		SetElapsedTimeHandler,
+	},
 }

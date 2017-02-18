@@ -23,3 +23,12 @@ func (d *Devices) Add(name string) Device {
 	d.List = append(d.List, dev)
 	return dev
 }
+
+func (d *Devices) FindDevice(deviceUUID string) (*Device, error) {
+	for _,  dev := range d.List {
+		if dev.UUID == deviceUUID {
+			return &dev, nil
+		}
+	}
+	return nil, ErrNoSuchDevice
+}

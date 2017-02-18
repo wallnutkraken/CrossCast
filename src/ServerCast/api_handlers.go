@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"encoding/json"
 	"io"
+	"github.com/gorilla/mux"
 )
 
 func bodyToObject(body io.ReadCloser, object interface{}) error {
@@ -97,6 +98,41 @@ func NewDeviceHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	dev := user.Devices.Add(lir.DeviceName)
 	w.WriteHeader(http.StatusOK)
-	response, _ := ToJSON(dev)
+	response, _ := ToJSON(GenericResponse{true, "", dev})
 	w.Write(response)
+}
+
+func SetElapsedTimeHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	deviceUUID := vars["uuid"]
+	req := SetElapsedTimeRequest{}
+	bodyToObject(r.Body, &req)
+	if req.ElapsedTime < 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		response, _ := ToJSON(GenericResponse{false, ErrNegativeNumber.Error(), nil})
+		w.Write(response)
+		return
+	}
+
+	user, err := tokens.FindUser(req.AccessToken)
+	if err != nil {
+		w.WriteHeader(http.StatusForbidden)
+		response, _ := ToJSON(GenericResponse{false, err.Error(), nil})
+		w.Write(response)
+		return
+	}
+
+	dev, err := user.Devices.FindDevice(deviceUUID)
+	if err != nil {
+		w.WriteHeader(http.StatusForbidden)
+		response, _ := ToJSON(GenericResponse{false, err.Error(), nil})
+		w.Write(response)
+		return
+	}
+
+	dev.ElapsedSeconds = req.ElapsedTime
+	response, _ := ToJSON(GenericResponse{true, "", nil})
+	w.Write(response)
+	w.WriteHeader(http.StatusOK)
 }

@@ -16,6 +16,7 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 	users = make(Users, 0)
 	tokens = TokenCollection{}
+	println("starting")
 
 	router = NewRouter()
 	log.Fatal(http.ListenAndServe(":8080", router))
