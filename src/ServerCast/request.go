@@ -26,6 +26,11 @@ type SetElapsedTimeRequest struct {
 	ElapsedTime int `json:"elapsed_time"`
 }
 
+type ChangePodcastRequest struct {
+	SetElapsedTimeRequest
+	URL string `json:"url"`
+}
+
 func (j LoginRequest) ToJSON() ([]byte, error) {
 	return json.Marshal(j)
 }

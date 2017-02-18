@@ -36,4 +36,10 @@ var routes = Routes{
 		"/device/{uuid}/elapsed",
 		SetElapsedTimeHandler,
 	},
+	Route{
+		"SetPodcastInfo",
+		"POST",
+		"/device/{uuid}/podcast",
+		SetPodcastHandler,
+	},
 }

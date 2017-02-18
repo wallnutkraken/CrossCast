@@ -157,3 +157,48 @@ func TestAPI_CanChangeElapsedTime(t *testing.T) {
 		t.Fatal("Elapsed time not actually changed in memory; was", seconds, "expected 20")
 	}
 }
+
+func TestAPI_CanChangeURL(t *testing.T) {
+	req :=  ChangePodcastRequest{SetElapsedTimeRequest{LoggedInRequest{tokens.Tokens[0].Token},
+				      25}, "https://www.relay.fm/cortex/feed"}
+	requestJSON, _ := ToJSON(req)
+	user, err := FindUser("emile")
+	if err != nil {
+		t.Fatal(err)
+	}
+	deviceUUID := user.Devices.List[0].UUID
+	url := "http://localhost:8080/device/" + deviceUUID + "/podcast"
+
+	r, err := http.NewRequest("POST", url, bytes.NewBuffer(requestJSON))
+	if err != nil {
+		t.Fatal(err)
+	}
+	r.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	response := GenericResponse{}
+	bodyRead, _ := ioutil.ReadAll(resp.Body)
+	r.Body.Close()
+	err = json.Unmarshal(bodyRead, &response)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !response.Success {
+		t.Fatal("Not successful", response)
+	}
+
+	emile, _ := FindUser("emile")
+	dev, _ := emile.Devices.FindDevice(deviceUUID)
+	seconds := dev.ElapsedSeconds
+	if seconds != 25 {
+		t.Fatal("Elapsed time not actually changed in memory; was", seconds, "expected 25")
+	}
+	if len(dev.CurrentPodcastURL) < 1 {
+		t.Fatal("URL empty")
+	}
+}
