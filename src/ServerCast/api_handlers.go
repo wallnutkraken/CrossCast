@@ -38,8 +38,13 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusForbidden)
 		return
 	}
+	token := tokens.New(user.Username)
 
-	w.Write([]byte(tokens.New(user.Username).Token))
+	response, _ := ToJSON(GenericResponse{
+		true,
+		"User is logged in, value contains access token",
+		LoginResponse{token.Token}})
+	w.Write(response)
 	w.WriteHeader(http.StatusOK)
 	return
 }
