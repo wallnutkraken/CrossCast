@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"io"
 	"github.com/gorilla/mux"
-	"github.com/SlyMarbo/rss"
 )
 
 func bodyToObject(body io.ReadCloser, object interface{}) error {
@@ -155,13 +154,6 @@ func SetPodcastHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write(response)
 		return
 	}
-	_, err := rss.Fetch(req.URL)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		response, _ := ToJSON(GenericResponse{false, err.Error(), nil})
-		w.Write(response)
-		return
-	}
 
 	user, err := tokens.FindUser(req.AccessToken)
 	if err != nil {
@@ -182,6 +174,35 @@ func SetPodcastHandler(w http.ResponseWriter, r *http.Request) {
 	dev.ElapsedSeconds = req.ElapsedTime
 	dev.CurrentPodcastURL = req.URL
 	response, _ := ToJSON(GenericResponse{true, "", nil})
+	w.Write(response)
+	w.WriteHeader(http.StatusOK)
+}
+
+func GetPodcastHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+	vars := mux.Vars(r)
+
+	deviceUUID := vars["uuid"]
+	req := LoggedInRequest{}
+	bodyToObject(r.Body, &req)
+
+	user, err := tokens.FindUser(req.AccessToken)
+	if err != nil {
+		w.WriteHeader(http.StatusForbidden)
+		response, _ := ToJSON(GenericResponse{false, err.Error(), nil})
+		w.Write(response)
+		return
+	}
+
+	dev, err := user.Devices.FindDevice(deviceUUID)
+	if err != nil {
+		w.WriteHeader(http.StatusForbidden)
+		response, _ := ToJSON(GenericResponse{false, err.Error(), nil})
+		w.Write(response)
+		return
+	}
+
+	response, _ := ToJSON(GenericResponse{true, "", dev})
 	w.Write(response)
 	w.WriteHeader(http.StatusOK)
 }

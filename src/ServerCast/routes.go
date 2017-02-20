@@ -42,4 +42,10 @@ var routes = Routes{
 		"/device/{uuid}/podcast",
 		SetPodcastHandler,
 	},
+	Route{
+		"GetDeviceInfo",
+		"POST",
+		"/device/{uuid}",
+		GetPodcastHandler,
+	},
 }
