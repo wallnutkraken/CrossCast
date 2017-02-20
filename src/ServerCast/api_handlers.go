@@ -178,7 +178,7 @@ func SetPodcastHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func GetPodcastHandler(w http.ResponseWriter, r *http.Request) {
+func GetDeviceInfoHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	vars := mux.Vars(r)
 
