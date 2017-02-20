@@ -249,3 +249,43 @@ func TestAPI_CanGetDevInfo(t *testing.T) {
 		t.Fatal("Device is not the same as in-memory")
 	}
 }
+
+func TestAPI_CanGetAllDevices(t *testing.T) {
+	req := LoggedInRequest{tokens.Tokens[0].Token}
+	requestJSON, _ := ToJSON(req)
+	url := "http://localhost:8080/device"
+
+	r, err := http.NewRequest("POST", url, bytes.NewBuffer(requestJSON))
+	if err != nil {
+		t.Fatal(err)
+	}
+	r.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	type testDeviceResponse struct {
+		Success bool `json:"OK"`
+		Message string `json:"detail,omitempty"`
+		Value []Device `json:"value,omitempty"`
+	}
+
+	response := testDeviceResponse{}
+	bodyRead, _ := ioutil.ReadAll(resp.Body)
+	r.Body.Close()
+	err = json.Unmarshal(bodyRead, &response)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !response.Success {
+		t.Fatal("Not successful", response)
+	}
+
+	emile, _ := FindUser("emile")
+	if len(emile.GetDevices()) != len(response.Value) {
+		t.Fatal("Device number inconsistent")
+	}
+}

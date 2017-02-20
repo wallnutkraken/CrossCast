@@ -206,3 +206,22 @@ func GetPodcastHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(response)
 	w.WriteHeader(http.StatusOK)
 }
+
+func GetDevicesHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+
+	req := LoggedInRequest{}
+	bodyToObject(r.Body, &req)
+
+	user, err := tokens.FindUser(req.AccessToken)
+	if err != nil {
+		w.WriteHeader(http.StatusForbidden)
+		response, _ := ToJSON(GenericResponse{false, err.Error(), nil})
+		w.Write(response)
+		return
+	}
+
+	response, _ := ToJSON(GenericResponse{true, "", user.GetDevices()})
+	w.Write(response)
+	w.WriteHeader(http.StatusOK)
+}

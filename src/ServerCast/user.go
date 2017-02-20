@@ -32,6 +32,14 @@ func (u *User) ChangePassword(password string) error {
 	return nil
 }
 
+func (u User) GetDevices() []Device {
+	devices := make([]Device, len(u.Devices.List))
+	for index, d := range u.Devices.List {
+		devices[index] = *d
+	}
+	return devices
+}
+
 type Users []*User
 
 func FindUser(username string) (*User, error) {
