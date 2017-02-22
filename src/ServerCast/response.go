@@ -9,7 +9,7 @@ type GenericResponse struct {
 }
 
 type LoginResponse struct {
-	AccessToken string `json:"access_token"`
+	AccessToken string `json:"token"`
 }
 
 func ToJSON(object interface{}) ([]byte, error) {

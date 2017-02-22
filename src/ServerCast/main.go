@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"math/rand"
 	"time"
+	"strconv"
+	"flag"
 )
 
 var (
@@ -18,8 +20,11 @@ func setup() {
 	tokens = TokenCollection{}
 	router = NewRouter()
 }
+var (
+	port = flag.Int("port", 8080, "Port")
+)
 
 func main() {
 	setup()
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe("0.0.0.0:" + strconv.Itoa(*port), router))
 }
